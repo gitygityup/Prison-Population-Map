@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Prison Population 2010 - 2020 Comparison</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.js"></script>
+<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.css" type="text/css">
+<style>
+body { margin: 0; padding: 0; }
+#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+
+/* Title styling */
+h1 {
+    text-align: center;
+    font-size: 24px;
+    margin: 20px 0;
+    position: relative;
+    z-index: 10;
+    background: white;
+}
+</style>
+</head>
+<body>
+
+<!-- Title for the map -->
+<h1>Prison Population 2010 - 2020 Comparison</h1>
+
+<style>
+body {
+overflow: hidden;
+}
+ 
+body * {
+-webkit-touch-callout: none;
+-webkit-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+user-select: none;
+} 
+.map {
+position: absolute;
+top: 0;
+bottom: 0;
+width: 100%;
+}
+.mapboxgl-compare .compare-swiper-vertical {
+	background-color: black;
+}
+.mapboxgl-compare {
+    background-color: black;}
+</style>
+<div id="comparison-container">
+<div id="before" class="map">
+</div>
+
+<div id="after" class="map"></div>
+</div>
+<script>
+
+
+mapboxgl.accessToken = 'pk.eyJ1IjoibnlhbWFsIiwiYSI6ImNtMm56Y3R2YTBiaWQyanB4Ym5rNnY2dm4ifQ.IgzT3H60qn1zyjUEuCpkIQ';
+const beforeMap = new mapboxgl.Map({
+container: 'before',
+
+style: 'mapbox://styles/nyamal/cm2omtrfr005r01pcbz080mtj',
+center: [-99.107, 41.726],// map center coorinates, in [lng,lat] format
+zoom: 4, //zoom 
+});
+ 
+const afterMap = new mapboxgl.Map({
+container: 'after',
+style: 'mapbox://styles/nyamal/cm2oo2npu007401qi76ljbqal',
+center: [-99.107, 41.726],// map center coorinates, in [lng,lat] format
+zoom: 4, //zoom
+});
+ 
+// Comparison slider
+const container = '#comparison-container';
+        const map = new mapboxgl.Compare(beforeMap, afterMap, container, {
+            mousemove: true // Enable comparing two maps by mouse movement
+        });
+
+        // Adding zoom control to both maps
+        beforeMap.addControl(new mapboxgl.NavigationControl());
+        afterMap.addControl(new mapboxgl.NavigationControl());
+
+        // Adding scale control to both maps
+        beforeMap.addControl(new mapboxgl.ScaleControl());
+        afterMap.addControl(new mapboxgl.ScaleControl());
+
+        // Adding interactivity: Popups for both maps
+        function addPopup(map, year) {
+            map.on('click', 'points-layer', (e) => {
+                const coordinates = e.lngLat;
+                const description = `Facility: ${e.features[0].properties.name} <br> Population (${year}): ${e.features[0].properties.population}`;
+
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(description)
+                    .addTo(map);
+            });
+
+            // Change cursor to pointer when hovering over points
+            map.on('mouseenter', 'points-layer', () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+
+            // Change it back when it leaves the point
+            map.on('mouseleave', 'points-layer', () => {
+                map.getCanvas().style.cursor = '';
+            });
+        }
+
+        // Apply popups for both maps
+        beforeMap.on('load', () => {
+            addPopup(beforeMap, "2010");
+        });
+
+        afterMap.on('load', () => {
+            addPopup(afterMap, "2020");
+        });
+
+    </script>
+
+</body>
+</html>
